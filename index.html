@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -136,7 +137,7 @@
             z-index: 2;
         }
 
-        /* 风力动画 */
+        /* 风力动画 - 修改后的样式 */
         .windy .weather-background {
             position: absolute;
             top: 0;
@@ -187,25 +188,52 @@
             }
         }
 
+        /* 新的树木样式 - 更简洁美观 */
+        .tree-container {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 80px;
+        }
+
         .tree {
             position: absolute;
-            bottom: 30px;
-            right: 30px;
-            width: 40px;
-            height: 80px;
-            background-color: #3a5f0b;
-            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             transform-origin: bottom center;
             animation: sway 3s ease-in-out infinite alternate;
         }
 
+        .tree-top {
+            width: 0;
+            height: 0;
+            border-left: 25px solid transparent;
+            border-right: 25px solid transparent;
+            border-bottom: 40px solid #3a5f0b;
+            margin-bottom: -15px;
+            z-index: 1;
+        }
+
+        .tree-middle {
+            width: 0;
+            height: 0;
+            border-left: 30px solid transparent;
+            border-right: 30px solid transparent;
+            border-bottom: 50px solid #3a5f0b;
+            margin-bottom: -20px;
+            z-index: 1;
+        }
+
         .tree-trunk {
-            position: absolute;
-            bottom: 0;
-            left: 15px;
             width: 10px;
             height: 30px;
             background-color: #5a2c02;
+            z-index: 2;
         }
 
         @keyframes sway {
@@ -287,48 +315,37 @@
             }
         }
 
-        /* 晴天动画 */
+        /* 晴天动画 - 简化后的样式 */
         .sunny .weather-background {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             overflow: hidden;
         }
 
         .sun {
             position: absolute;
-            top: 30%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80px;
-            height: 80px;
+            width: 70px;
+            height: 70px;
             background: radial-gradient(circle, #ffde59, #ff9a00);
             border-radius: 50%;
-            box-shadow: 0 0 50px #ff9a00;
+            box-shadow: 0 0 30px #ff9a00;
             animation: pulse 3s ease-in-out infinite;
-        }
-
-        .sun-ray {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 4px;
-            height: 30px;
-            background-color: rgba(255, 222, 89, 0.7);
-            border-radius: 2px;
-            transform-origin: top center;
         }
 
         @keyframes pulse {
             0%, 100% {
-                transform: translateX(-50%) scale(1);
-                box-shadow: 0 0 50px #ff9a00;
+                transform: scale(1);
+                box-shadow: 0 0 30px #ff9a00;
             }
             50% {
-                transform: translateX(-50%) scale(1.05);
-                box-shadow: 0 0 70px #ff9a00;
+                transform: scale(1.05);
+                box-shadow: 0 0 50px #ff9a00;
             }
         }
 
@@ -459,7 +476,7 @@
     <div class="loader" id="loader"></div>
     
     <div class="weather-container" id="weather-container">
-        <!-- 风力卡片 -->
+        <!-- 风力卡片 - 修改后的结构 -->
         <div class="weather-card windy" id="windy-card">
             <div class="weather-title" id="windy-title">大风</div>
             <div class="weather-icon" id="windy-icon">🌬️</div>
@@ -470,8 +487,13 @@
                 <div class="cloud cloud-1"></div>
                 <div class="cloud cloud-2"></div>
                 <div class="cloud cloud-3"></div>
-                <div class="tree"></div>
-                <div class="tree-trunk"></div>
+                <div class="tree-container">
+                    <div class="tree">
+                        <div class="tree-top"></div>
+                        <div class="tree-middle"></div>
+                        <div class="tree-trunk"></div>
+                    </div>
+                </div>
             </div>
         </div>
         
@@ -489,14 +511,14 @@
             </div>
         </div>
         
-        <!-- 晴天卡片 -->
+        <!-- 晴天卡片 - 简化后的结构 -->
         <div class="weather-card sunny" id="sunny-card">
             <div class="weather-title" id="sunny-title">晴天</div>
             <div class="weather-icon" id="sunny-icon">☀️</div>
             <div class="weather-description" id="sunny-description">紫外线: --<br>能见度: -- km</div>
             <div class="temperature" id="sunny-temp">--°C</div>
             <div class="location" id="sunny-location"></div>
-            <div class="weather-background" id="sun-container">
+            <div class="weather-background">
                 <div class="sun"></div>
             </div>
         </div>
@@ -529,7 +551,6 @@
         // 初始化天气动画
         document.addEventListener('DOMContentLoaded', function() {
             createRaindrops();
-            createSunRays();
             createSnowflakes();
             
             // 设置搜索按钮事件
@@ -558,22 +579,6 @@
                 raindrop.style.animationDuration = `${0.5 + Math.random() * 1.5}s`;
                 raindrop.style.animationDelay = `${Math.random() * 2}s`;
                 container.appendChild(raindrop);
-            }
-        }
-        
-        // 创建阳光射线
-        function createSunRays() {
-            const container = document.getElementById('sun-container');
-            // 清除现有光线
-            const existingRays = container.querySelectorAll('.sun-ray');
-            existingRays.forEach(ray => ray.remove());
-            
-            for (let i = 0; i < 12; i++) {
-                const ray = document.createElement('div');
-                ray.className = 'sun-ray';
-                ray.style.transform = `translate(-50%, -50%) rotate(${i * 30}deg) translateY(-50px)`;
-                ray.style.animation = `pulse 3s ease-in-out infinite ${i * 0.2}s`;
-                container.appendChild(ray);
             }
         }
         
